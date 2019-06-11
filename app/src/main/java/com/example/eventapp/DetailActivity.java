@@ -8,6 +8,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,9 +26,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.eventapp.Adapter.EventRecyclerAdapter;
 import com.example.eventapp.Adapter.PesertaListAdapter;
+import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.Model.Item;
 import com.example.eventapp.Model.PesertaModel;
+import com.example.eventapp.Model.Utilities;
 import com.example.eventapp.Model.apiInterface;
 import com.example.eventapp.Service.apiService;
 
@@ -47,7 +50,7 @@ public class DetailActivity extends AppCompatActivity {
     private String newName, newTelp, newEmail;
     private EditText et_nama, et_telp, et_email;
     private DatabaseHelper db;
-    private List<PesertaModel> pesertaModels = new ArrayList<PesertaModel>();
+    private ArrayList<PesertaModel> pesertaModels = new ArrayList<PesertaModel>();
     private ListView lv_peserta,pesertas;
     private PesertaListAdapter listAdapter;
     private String event_id;
@@ -59,6 +62,8 @@ public class DetailActivity extends AppCompatActivity {
     apiInterface apiI;
     private PopupWindow mPopupWindow;
     private ImageView event_image;
+    private RecyclerView recyclerView;
+    private PesertaRecyclerAdapter pesertaRecyclerAdapter;
 
 
 
@@ -69,8 +74,6 @@ public class DetailActivity extends AppCompatActivity {
 
         bottom_model = findViewById(R.id.bottom_model);
         View llBottomSheet = findViewById(R.id.bottom_sheet);
-        pesertas = (ListView) llBottomSheet.findViewById(R.id.lv_pesertas);
-        lv_peserta = (ListView) findViewById(R.id.list_perserta);
         btnTambah = (Button) llBottomSheet.findViewById(R.id.btn_tambah_peserta);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         tv_content = findViewById(R.id.tv_content);
@@ -79,14 +82,13 @@ public class DetailActivity extends AppCompatActivity {
         tv_harga = (TextView) bottom_model.findViewById(R.id.tv_harga);
         event_image = findViewById(R.id.iv_event_image);
 
+        recyclerView = (RecyclerView) findViewById(R.id.peserta_recycler_view);
+        recyclerView.setHasFixedSize(true);
+
 
         apiInit = new apiService();
         apiI = apiService.getClient().create(apiInterface.class);
-
         db = new DatabaseHelper(this);
-        btnJoin = findViewById(R.id.btn_join);
-
-
 
         Bundle extras = getIntent().getExtras();
         if(extras != null){
@@ -100,19 +102,12 @@ public class DetailActivity extends AppCompatActivity {
 
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.detail_activity);
-        listAdapter = new PesertaListAdapter(this, pesertaModels);
-        pesertas.setAdapter(listAdapter);
-        lv_peserta.setAdapter(listAdapter);
-
-
 
         btnTambah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 showPopUp();
-
-                //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
             }
         });
@@ -131,10 +126,15 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-
-        db.closeDB();
         seeDetail(event_id);
+        db.closeDB();
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        pesertaRecyclerAdapter = new PesertaRecyclerAdapter(pesertaModels, this);
+
+        pesertaRecyclerAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(pesertaRecyclerAdapter);
 
 
     }
@@ -159,11 +159,6 @@ public class DetailActivity extends AppCompatActivity {
         et_email = (EditText)customView.findViewById(R.id.et_email);
 
 
-
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-//                new formFragment()).commit();
-
-
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,43 +175,25 @@ public class DetailActivity extends AppCompatActivity {
                 newTelp = et_telp.getText().toString();
                 newEmail = et_email.getText().toString();
 
-//                PesertaModel c1 = new PesertaModel();
-//                c1.setNamaPeserta(newName);
-//                c1.setEmail(newEmail);
-//                c1.setPhone(newTelp);
-//                c1.setId_event(event_id);
+                PesertaModel c1 = new PesertaModel();
+                c1.setNamaPeserta(newName);
+                c1.setEmail(newEmail);
+                c1.setPhone(newTelp);
+                c1.setId_event(event_id);
 
-                PesertaModel c2 = new PesertaModel();
-                c2.setNamaPeserta("fathan");
-                c2.setEmail("lala@gmail.com");
-                c2.setPhone("8723640");
-                c2.setId_event(event_id);
-
-                PesertaModel c3 = new PesertaModel();
-                c3.setNamaPeserta("fathan13");
-                c3.setEmail("lala@gmai2l.com");
-                c3.setPhone("87236420");
-                c3.setId_event(event_id);
-
-
-                //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                //pesertaModels.add(c1);
-                pesertaModels.add(c2);
-                pesertaModels.add(c3);
-
-
+                pesertaModels.add(c1);
                 mPopupWindow.dismiss();
-                listAdapter.notifyDataSetChanged();
+                pesertaRecyclerAdapter.notifyDataSetChanged();
 
-                db.daftarPeserta(c2);
-                db.daftarPeserta(c3);
+                db.daftarPeserta(c1);
                 db.closeDB();
+
+
 
 
             }
         });
-//
-//
+
         mPopupWindow.showAtLocation(mCoordinatorLayout, Gravity.CENTER,0,0);
 
 
@@ -225,8 +202,6 @@ public class DetailActivity extends AppCompatActivity {
     public void seeDetail(String event_id) {
 
         Call<Item> Itemmm;
-
-
         Itemmm = apiI.getDetail(event_id);
 
 
@@ -255,6 +230,7 @@ public class DetailActivity extends AppCompatActivity {
                     tv_event_Title.setText(response.body().getTitle());
                     tv_content.setText(content);
                     tv_author.setText(response.body().getAuthor());
+                    tv_harga.setText(Utilities.FCurrency(Long.parseLong(response.body().getHarga().get(0).getHarga()))+",00");
                     Glide.with(getApplicationContext()).load(response.body().getImage()).into(event_image);
 
 
@@ -262,6 +238,7 @@ public class DetailActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call<Item> call, Throwable t) {
+
                 //empty_view.setVisibility(View.VISIBLE);
                 //recyclerView.setVisibility(View.GONE);
             }

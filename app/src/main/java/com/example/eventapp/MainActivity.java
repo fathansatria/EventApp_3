@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     String eventDesc = Utilities.FCurrency(Long.parseLong(events.get(position).getHarga().get(0).getHarga()));
                     String eventID = events.get(position).getId();
 
+
                 goToDetail(eventName, eventDesc, eventID);
 
                 }
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this,DetailActivity.class);
         intent.putExtra("eventName", eventName);
-        intent.putExtra("eventDesc", eventDesc);
+        intent.putExtra("eventPrice", eventDesc);
         intent.putExtra("eventId", eventId);
 
         startActivity(intent);

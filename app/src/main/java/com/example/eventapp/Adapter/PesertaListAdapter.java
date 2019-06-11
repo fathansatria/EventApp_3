@@ -2,6 +2,7 @@ package com.example.eventapp.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,17 +58,21 @@ public class PesertaListAdapter extends BaseAdapter {
 
 
 
+
         PesertaModel peserta = pesertaData.get(position);
 
         tv_name.setText(peserta.getNamaPeserta());
         tv_email.setText(peserta.getEmail());
         tv_telp.setText(peserta.getPhone());
 
+        Log.i("test", peserta.getNamaPeserta());
 
         return vi;
     }
 
     public void addData(){
+
+        notifyDataSetChanged();
 
     }
 }
