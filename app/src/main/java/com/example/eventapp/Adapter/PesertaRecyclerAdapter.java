@@ -1,40 +1,34 @@
 package com.example.eventapp.Adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.DetailActivity;
-import com.example.eventapp.MainActivity;
-import com.example.eventapp.Model.EventModel;
-import com.example.eventapp.Model.Item;
+import com.example.eventapp.DetailActivity2;
 import com.example.eventapp.Model.PesertaModel;
-import com.example.eventapp.Model.Utilities;
 import com.example.eventapp.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecyclerAdapter.PesertaViewHolder> {
 
     private ArrayList<PesertaModel> pesertas;
     private String eventName, eventDesc;
     Context context;
+    private DatabaseHelper db;
 
-    public PesertaRecyclerAdapter(ArrayList<PesertaModel> pesertas, Context context) {
+    public PesertaRecyclerAdapter(ArrayList<PesertaModel> pesertas, Context context, DatabaseHelper database) {
 
         this.pesertas = pesertas;
         this.context = context;
+        this.db = database;
     }
 
     @NonNull
@@ -49,11 +43,46 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
     }
 
     @Override
-    public void onBindViewHolder(PesertaRecyclerAdapter.PesertaViewHolder holder, int position) {
+    public void onBindViewHolder(PesertaRecyclerAdapter.PesertaViewHolder holder, final int position) {
 
         holder.tv_peserta_name.setText(String.valueOf(pesertas.get(position).getNamaPeserta()));
         holder.tv_peserta_phone.setText(pesertas.get(position).getPhone());
         holder.tv_peserta_email.setText(pesertas.get(position).getEmail());
+
+        holder.btn_delete.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                db.deletePesertaDaftar(pesertas.get(position));
+                pesertas.remove(position);
+
+                try {
+
+                    DetailActivity.notifyAdapter();
+
+                }
+                catch (Exception e) {
+
+                    DetailActivity2.notifyAdapter();
+
+                }
+
+
+                try {
+
+                    DetailActivity2.notifyAdapter();
+
+                }
+                catch (Exception e) {
+
+                    DetailActivity.notifyAdapter();
+
+                }
+
+                db.closeDB();
+
+
+            }
+        });
 
 
 
@@ -69,7 +98,7 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
     public static class PesertaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView tv_peserta_name, tv_peserta_phone, tv_peserta_email;
-        private ImageView iv_event_pics;
+        private ImageButton btn_delete;
 
         //private CustomItemClickListener mListener;
 
@@ -77,9 +106,10 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
         public PesertaViewHolder(View itemView) {
 
             super(itemView);
-            tv_peserta_name = (TextView) itemView.findViewById(R.id.tv_pesertaName);
-            tv_peserta_email = (TextView) itemView.findViewById(R.id.tv_pesertaEmail);
-            tv_peserta_phone = (TextView) itemView.findViewById(R.id.tv_pesertaTelp);
+            tv_peserta_name = itemView.findViewById(R.id.tv_pesertaName);
+            tv_peserta_email = itemView.findViewById(R.id.tv_pesertaEmail);
+            tv_peserta_phone = itemView.findViewById(R.id.tv_pesertaTelp);
+            btn_delete = itemView.findViewById(R.id.btn_delete);
 
 
 

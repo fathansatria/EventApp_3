@@ -10,15 +10,15 @@
 
 
 
-    <LinearLayout
+    <ScrollView
 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
@@ -44,79 +44,72 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <ImageView
+                android:layout_margin="10dp"
+                android:id="@+id/iv_event_image"
+                android:layout_width="200dp"
+                android:layout_height="200dp" />
+
+            <TextView
+                android:id="@+id/tv_content"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:background="#C4C4C4"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:inputType="textMultiLine"
+                android:text="17:00 - 19:00" />
 
-                <ImageView
-                    android:layout_margin="10dp"
-                    android:id="@+id/iv_event_image"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp" />
-
-                <TextView
-                    android:id="@+id/tv_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:inputType="textMultiLine"
-                    android:text="17:00 - 19:00" />
-
-                <TextView
-                    android:id="@+id/author"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Pejaten Village" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Pejaten Village" />
 
 
         </LinearLayout>
 
-    </LinearLayout>
+    </ScrollView>
 
-    <android.support.v4.widget.NestedScrollView
+    <!--<android.support.v4.widget.NestedScrollView-->
 
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:id="@+id/bottom_sheet"
-        android:background="@color/colorAccent"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
-        app:behavior_hideable="false"
-        app:behavior_peekHeight = "56dp">
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="350dp"-->
+        <!--android:id="@+id/bottom_sheet"-->
+        <!--android:background="@color/colorAccent">-->
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:orientation="vertical">-->
+        <!--&lt;!&ndash;<LinearLayout&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="match_parent"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:orientation="vertical">&ndash;&gt;-->
 
-            <!--<TextView-->
-                <!--android:layout_margin="10dp"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Peserta Baru"-->
-                <!--android:gravity="center"-->
-                <!--android:textSize="25sp"-->
-                <!--android:textColor="@android:color/white"/>-->
-
-            <!--&lt;!&ndash;<ListView&ndash;&gt;-->
-
-                <!--&lt;!&ndash;android:id="@+id/peserta_list"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_marginTop="10dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
                 <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:text="Peserta Baru"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textSize="25sp"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textColor="@android:color/white"/>&ndash;&gt;-->
 
-            <!--&lt;!&ndash;</ListView>&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;<ListView&ndash;&gt;&ndash;&gt;-->
 
-        <!--</LinearLayout>-->
+                <!--&lt;!&ndash;&lt;!&ndash;android:id="@+id/peserta_list"&ndash;&gt;&ndash;&gt;-->
+                <!--&lt;!&ndash;&lt;!&ndash;android:layout_marginTop="10dp"&ndash;&gt;&ndash;&gt;-->
+                <!--&lt;!&ndash;&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;&ndash;&gt;-->
+                <!--&lt;!&ndash;&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;&ndash;&gt;-->
 
-        <include layout="@layout/bottom_sheet" />
+            <!--&lt;!&ndash;&lt;!&ndash;</ListView>&ndash;&gt;&ndash;&gt;-->
+
+        <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
 
 
-    </android.support.v4.widget.NestedScrollView>
+
+
+    <!--</android.support.v4.widget.NestedScrollView>-->
+
+    <include layout="@layout/bottom_sheet" />
+
+
 
 
 

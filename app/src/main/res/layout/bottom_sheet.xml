@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="400dp"
     android:background="@color/colorAccent"
     android:orientation="vertical"
     app:behavior_hideable="false"
@@ -11,62 +11,89 @@
     app:layout_behavior="@string/bottom_sheet_behavior"
     app:behavior_peekHeight = "56dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_harga"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:background="#000000"
-            android:gravity="center"
-            android:text="Rp. 200.000 / Orang"
-            android:ems="16"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:background="@android:color/darker_gray"
-            android:layout_marginHorizontal="0dp"
-            android:padding="15dp"
-            android:src="@drawable/ic_shopping_cart_black_56dp"/>
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!--<ListView-->
-
-            <!--android:id="@+id/lv_pesertas"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent" >-->
-
-        <!--</ListView>-->
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/peserta_recycler_view"
+        <LinearLayout
+            android:id="@+id/bottom_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_harga"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:background="#000000"
+                android:ems="16"
+                android:gravity="center"
+                android:text="Rp. 200.000 / Orang"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="0dp"
+                android:background="@android:color/darker_gray"
+                android:padding="15dp"
+                android:src="@drawable/ic_shopping_cart_black_56dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_below="@id/bottom_header">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/peserta_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_marginTop="50dp"
+                android:id="@+id/empty_peserta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_info_outline_black_64dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Belum Ada Peserta Yang Ditambah"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btn_tambah_peserta"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:background="@android:color/darker_gray"
             android:text="Tambah Peserta"
             android:textAllCaps="false"
             android:textSize="20sp"
             android:textStyle="normal" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

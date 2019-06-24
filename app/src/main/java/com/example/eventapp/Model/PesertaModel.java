@@ -1,11 +1,22 @@
 package com.example.eventapp.Model;
 
+import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
+
 public class PesertaModel {
 
     private String namaPeserta;
     private String email;
     private String phone;
     private String id_event;
+    private String keterangan;
+
+    public PesertaModel(){
+        this.namaPeserta = "";
+        this.email = "";
+        this.phone = "";
+        this.id_event = "-9999";
+        this.keterangan = "";
+    }
 
     public void setNamaPeserta(String namaPeserta) {
         this.namaPeserta = namaPeserta;
@@ -23,6 +34,10 @@ public class PesertaModel {
         this.id_event = id_event;
     }
 
+    public void setKeterangan(String keterangan) {
+        this.keterangan = keterangan;
+    }
+
     public String getNamaPeserta() {
         return namaPeserta;
     }
@@ -37,5 +52,9 @@ public class PesertaModel {
 
     public String getId_event() {
         return id_event;
+    }
+
+    public String getKeterangan() {
+        return keterangan;
     }
 }
