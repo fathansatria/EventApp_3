@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class apiService {
 
 
-    private static final String BASE_URL = "https://p.republika.co.id/";
+    private static final String BASE_URL = "xxxxxxxxxxxx";
 
 
     public static class AddHeaderInterceptor implements Interceptor {
@@ -34,7 +34,7 @@ public class apiService {
         public okhttp3.Response intercept(Chain chain) throws IOException {
 
             Request.Builder builder = chain.request().newBuilder();
-            builder.addHeader("Authorization", "3fj93je4999392Je7d7dr37$8R390f2320489247239578fn2fbrbfdn");
+            builder.addHeader("xxxxxxxxxx", "xxxxxxxxxxxxxxxxxxxxxx");
 
             return chain.proceed(builder.build());
         }
