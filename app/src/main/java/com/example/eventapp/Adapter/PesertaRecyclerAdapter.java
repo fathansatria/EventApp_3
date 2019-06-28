@@ -1,8 +1,10 @@
 package com.example.eventapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,11 @@ import android.widget.TextView;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.DetailActivity;
 import com.example.eventapp.DetailActivity2;
+import com.example.eventapp.MainActivity;
+import com.example.eventapp.MainFragment;
 import com.example.eventapp.Model.PesertaModel;
+import com.example.eventapp.NotifItem;
+import com.example.eventapp.NotificationFragment;
 import com.example.eventapp.R;
 
 import java.util.ArrayList;
@@ -53,6 +59,14 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
             public void onClick(View v) {
 
                 db.deletePesertaDaftar(pesertas.get(position));
+
+                NotifItem n = new NotifItem();
+                n.setNotifTitle(pesertas.get(position).getNamaPeserta());
+                n.setNotifContent(pesertas.get(position).getPhone());
+                n.setValue(pesertas.get(position).getId_event());
+
+                db.deleteNotification(n);
+
                 pesertas.remove(position);
 
                 try {
@@ -62,23 +76,22 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
                 }
                 catch (Exception e) {
 
-                    DetailActivity2.notifyAdapter();
+                    try {
+
+                        DetailActivity2.notifyAdapter();
+
+                    }
+                    catch (Exception e1) {
+
+                        Log.d("Adapter error", "no adapter can notify");
+
+                    }
 
                 }
 
-
-                try {
-
-                    DetailActivity2.notifyAdapter();
-
-                }
-                catch (Exception e) {
-
-                    DetailActivity.notifyAdapter();
-
-                }
 
                 db.closeDB();
+
 
 
             }
@@ -110,7 +123,6 @@ public class PesertaRecyclerAdapter extends RecyclerView.Adapter<PesertaRecycler
             tv_peserta_email = itemView.findViewById(R.id.tv_pesertaEmail);
             tv_peserta_phone = itemView.findViewById(R.id.tv_pesertaTelp);
             btn_delete = itemView.findViewById(R.id.btn_delete);
-
 
 
         }

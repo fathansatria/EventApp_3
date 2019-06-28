@@ -1,37 +1,36 @@
 package com.example.eventapp;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
+
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
-import com.example.eventapp.Adapter.CustomItemClickListener;
-import com.example.eventapp.Adapter.EventRecyclerAdapter;
-import com.example.eventapp.Adapter.RecyclerViewTouchListener;
-import com.example.eventapp.Model.Item;
+import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.Model.apiInterface;
-import com.example.eventapp.Service.MyFirebaseMessagingService;
 import com.example.eventapp.Service.apiService;
-import com.example.eventapp.Model.Utilities;
-import java.util.ArrayList;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<Item> events;
-    RecyclerView recyclerView;
-    private EventRecyclerAdapter eventAdapter;
-    private apiService apiInit = new apiService();
-    private ProgressDialog pDialog;
+
     apiInterface apiI = apiService.getClient().create(apiInterface.class);
+    private ImageButton btn_notification, backButton;
+    private TextView appName, nNotif;
+    private DatabaseHelper db;
+    private ArrayList<NotifItem> notifItems;
+    private int jumlahNotif = 0;
+    private Fragment notifFragment, mainFragment;
+
 
 
 
@@ -40,121 +39,123 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //init recycler view
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
 
-        pDialog = new ProgressDialog(this, R.style.MyAlertDialogStyle);
-        pDialog.setCancelable(false);
+        btn_notification = findViewById(R.id.btn_notif);
+        appName = findViewById(R.id.title_event);
+        backButton = findViewById(R.id.btn_back_notif);
+        nNotif = findViewById(R.id.cart_badge);
+        db = new DatabaseHelper(this);
+        mainFragment = new MainFragment();
+        cekNotif();
 
-        if (getIntent().getExtras()!=null){
+        FirebaseMessaging.getInstance().subscribeToTopic("global")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
 
-            String event_id;
+                        if (!task.isSuccessful()) {
 
-            for (String key : getIntent().getExtras().keySet()){
+                            Log.d("notif", "Notification Received");
 
-                if (key.equals("event_id")){
-                    event_id = getIntent().getExtras().getString(key);
-                    goToDetail(event_id);
-                }
+                        }
 
-            }
+                    }
+                });
+
+
+        if(savedInstanceState == null){
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mainFragment).commit();
+
         }
 
-        //melakukan pencarian data
-        doSearch("","quran");
 
-
-
-        //listener buat item click dari recycler
-        recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getApplicationContext(), recyclerView, new CustomItemClickListener() {
-
+        btn_notification.setOnClickListener(new View.OnClickListener() {
             @Override
-                public void onClick(View view, int position) {
+            public void onClick(View view) {
 
-                    String eventID = events.get(position).getId();
+                notifFragment = new NotificationFragment();
 
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        notifFragment, notifFragment.toString()).addToBackStack(mainFragment.toString()).commit();
 
-                goToDetail(eventID);
-
-                }
-
-                @Override
-                public void onLongClick(View view, int position) {
-
-
-                    String eventID = events.get(position).getId();
-
-                    goToDetail(eventID);
-                }
-        }));
-
-    }
-
-    //procedur ke DetailActivity
-    void goToDetail(String eventId){
-
-        Intent intent = new Intent(this,DetailActivity.class);
-        intent.putExtra("eventId", eventId);
-
-        startActivity(intent);
-    }
-
-    public void doSearch(String keyword, String type) {
-
-        Call<ArrayList<Item>> Itemmm;
-        pDialog.setMessage(" Harap Tunggu ");
-        pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        showDialog();
-
-        if("".equals(keyword)) {
-            Itemmm = apiI.getJenis(type,0);
-        } else {
-            Itemmm = apiI.getSearch(type,keyword,0);
-        }
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
-
-        //Input data to recycler view
-        Itemmm.enqueue(new Callback<ArrayList<Item>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
-
-                if(response.body() == null) {
-
-                    Toast.makeText(getApplicationContext(), " Data Not Found ", Toast.LENGTH_LONG).show();
-                    recyclerView.setVisibility(View.GONE);
-
-                }else {
-
-                    hideDialog();
-                    events = new ArrayList<>(response.body());
-                    eventAdapter = new EventRecyclerAdapter (new ArrayList<>(response.body()),getApplicationContext());
-                    eventAdapter.notifyDataSetChanged();
-                    recyclerView.setAdapter(eventAdapter);
-                    //empty_view.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-
-                }
-            }
-            @Override
-            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
-
-                Toast.makeText(getApplicationContext(), " Error, Try Again ", Toast.LENGTH_LONG).show();
-                recyclerView.setVisibility(View.GONE);
             }
         });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                onBackPressed();
+
+            }
+        });
+
     }
 
-    private void showDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
+
+
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+
+        if (btn_notification.getVisibility() == View.GONE){
+
+            btn_notification.setVisibility(View.VISIBLE);
+        }
+
+        if (appName.getVisibility() == View.GONE){
+
+            appName.setVisibility(View.VISIBLE);
+        }
+
+        if (backButton.getVisibility() == View.VISIBLE){
+
+            backButton.setVisibility(View.GONE);
+        }
+
+        if (nNotif.getVisibility() == View.GONE && jumlahNotif != 0){
+
+            nNotif.setVisibility(View.VISIBLE);
+        }
+
+        cekNotif();
+
+        if (notifFragment != null && notifFragment.isVisible()) {
+
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    mainFragment, mainFragment.toString()).addToBackStack(mainFragment.
+                    toString()).commit();
+
+        }
+
+
+
     }
 
-    private void hideDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
+    public void cekNotif(){
+
+        jumlahNotif = 0;
+        notifItems = db.getAllNotif();
+
+        for (NotifItem n : notifItems){
+
+            if(n.getStatus().equals("unread")){
+                jumlahNotif ++;
+            }
+
+        }
+
+        if(jumlahNotif == 0){
+            nNotif.setVisibility(View.GONE);
+        }
+        else {
+            nNotif.setVisibility(View.VISIBLE);
+            nNotif.setText(String.valueOf(jumlahNotif));
+        }
+
+
     }
 }

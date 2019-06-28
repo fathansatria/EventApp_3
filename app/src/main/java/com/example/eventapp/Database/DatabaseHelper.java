@@ -3,19 +3,13 @@ package com.example.eventapp.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.example.eventapp.Model.PesertaModel;
-
+import com.example.eventapp.NotifItem;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.jar.Attributes;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -53,6 +47,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             EMAIL_DAFTAR + " text," +
             TELEPON_DAFTAR + " text )";
 
+    private static final String TABLE_NOTIF = "daftar_notif_table";
+    private static final String VALUE_NOTIF = "value_notif";
+    private static final String STATUS = "status";
+    private static final String NOTIF_TITLE = "notif_title";
+    private static final String NOTIF_CONTENT = "content";
+    private static final String ID_NOTIF = "id_notif";
+    private static final String TYPE_NOTIF = "value";
+
+
+    private String TBL_CREATE_NOTIF = "create table " + TABLE_NOTIF + " (" +
+            ID_NOTIF + " int primary key," +
+            NOTIF_TITLE + " text," +
+            NOTIF_CONTENT + " text," +
+            STATUS + " text," +
+            TYPE_NOTIF + " text," +
+            VALUE_NOTIF + " text)";
+
     public DatabaseHelper(Context context)
     {
         super(context,DATABASENAME, null, DATABASE_VERSION);
@@ -63,12 +74,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(TBL_CREATE_MHS);
         sqLiteDatabase.execSQL(TBL_CREATE_DAFTAR);
+        sqLiteDatabase.execSQL(TBL_CREATE_NOTIF);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PESERTA);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DAFTAR);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIF);
+
 
         onCreate(sqLiteDatabase);
     }
@@ -82,6 +97,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(TELEPON, peserta.getPhone());
 
         long id = db.insert(TABLE_PESERTA, null, values);
+
+        // assigning tags to tbl create mengambil
+        db.close();
+
+        return id ;
+    }
+
+    public long daftarNotif(NotifItem notifItem){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NOTIF_TITLE, notifItem.getNotifTitle());
+        values.put(NOTIF_CONTENT, notifItem.getNotifContent());
+        values.put(VALUE_NOTIF, notifItem.getValue());
+        values.put(STATUS, notifItem.getStatus());
+        values.put(TYPE_NOTIF, notifItem.getType());
+
+        long id = db.insert(TABLE_NOTIF, null, values);
 
         // assigning tags to tbl create mengambil
         db.close();
@@ -116,7 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<PesertaModel> getAllPeserta() {
 
-        ArrayList<PesertaModel> pesertaModels = new ArrayList<PesertaModel>();
+        ArrayList<PesertaModel> pesertaModels = new ArrayList<>();
 
         PesertaModel p1 = new PesertaModel();
         p1.setNamaPeserta(" Nama ");
@@ -149,9 +182,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return pesertaModels;
     }
 
+    public ArrayList<NotifItem> getAllNotif() {
+
+        ArrayList<NotifItem> notifItems = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_NOTIF;
+        Log.e(DATABASENAME, selectQuery);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                NotifItem std = new NotifItem();
+                std.setNotifTitle((c.getString(c.getColumnIndex(NOTIF_TITLE))));
+                std.setNotifContent(c.getString(c.getColumnIndex(NOTIF_CONTENT)));
+                std.setStatus(c.getString(c.getColumnIndex(STATUS)));
+                std.setValue(c.getString(c.getColumnIndex(VALUE_NOTIF)));
+                std.setType(c.getString(c.getColumnIndex(TYPE_NOTIF)));
+
+                // adding to todo list
+                notifItems.add(std);
+            } while (c.moveToNext());
+        }
+        return notifItems;
+    }
+
     public ArrayList<String> getAllPesertaName() {
 
-        ArrayList<String> pesertaNames = new ArrayList<String>();
+        ArrayList<String> pesertaNames = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + TABLE_PESERTA;
         pesertaNames.add("Nama");
         Log.e(DATABASENAME, selectQuery);
@@ -232,6 +293,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] { peserta.getNamaPeserta(), peserta.getEmail(), peserta.getId_event() });
     }
 
+    public void deleteNotification( NotifItem notifItem) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // delete row
+        db.delete(TABLE_NOTIF, NOTIF_TITLE + " = ? AND " + VALUE_NOTIF + " = ?",
+                new String[] { notifItem.getNotifTitle(), String.valueOf(notifItem.getValue()) });
+
+        closeDB();
+    }
+
+
+
     public ArrayList<PesertaModel> getAllPesertaByName(String nama) {
 
         ArrayList<PesertaModel> pesertas = new ArrayList<PesertaModel>();
@@ -262,6 +336,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return pesertas;
 
+    }
+
+    public int updateNotif(NotifItem notifItem) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NOTIF_TITLE, notifItem.getNotifTitle());
+        values.put(NOTIF_CONTENT,notifItem.getNotifContent());
+        values.put(VALUE_NOTIF, notifItem.getValue());
+        values.put(STATUS, "read");
+
+
+        // updating row
+        return db.update(TABLE_NOTIF, values, VALUE_NOTIF + " = ? AND " + NOTIF_TITLE + " = ? ",
+                new String[] { notifItem.getValue(), notifItem.getNotifTitle() });
     }
 
 

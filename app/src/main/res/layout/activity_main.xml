@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_layout"
     tools:context=".MainActivity">
 
     <android.support.design.widget.AppBarLayout
 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:theme="@style/AppTheme.AppBarOverlay">
+
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -19,36 +21,99 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <TextView
-                android:id="@+id/title_course"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:fontFamily="@string/app_name"
-                android:text="Event App"
-                android:textColor="#ffffffff"
-                android:textSize="20dp" />
+            <RelativeLayout
+                android:id="@+id/view_appbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp">
+
+                <TextView
+                    android:id="@+id/title_event"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@string/app_name"
+                    android:text="Event App"
+                    android:textColor="#ffffffff"
+                    android:layout_marginTop="6dp"
+                    android:textSize="20dp" />
+
+
+                <FrameLayout
+                    style="?attr/actionButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="6dp"
+                    android:clipToPadding="false"
+                    android:focusable="true">
+
+                    <ImageButton
+                        android:id="@+id/btn_notif"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:src="@drawable/ic_notif_button" />
+
+
+                    <TextView
+                        android:id="@+id/cart_badge"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="right|end|top"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="-5dp"
+                        android:layout_marginRight="-5dp"
+                        android:background="@drawable/badge_bg"
+                        android:gravity="center"
+                        android:padding="3dp"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="7sp" />
+
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/btn_back_notif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/ic_back_button"
+                    android:layout_marginTop="6dp"
+                    android:visibility="gone"/>
+
+
+
+            </RelativeLayout>
+
+
 
         </android.support.v7.widget.Toolbar>
 
+
+
     </android.support.design.widget.AppBarLayout>
 
+    <FrameLayout
 
-
-    <LinearLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:orientation="vertical">
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <!--<android.support.v7.widget.RecyclerView-->
 
-    </LinearLayout>
+            <!--android:id="@+id/recycler_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
+
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>

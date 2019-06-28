@@ -81,6 +81,7 @@ public class DetailActivity extends AppCompatActivity {
         db = new DatabaseHelper(this);
 
         //ambil event id dari main activity
+
         Bundle extras = getIntent().getExtras();
         if(extras != null){
 
@@ -435,6 +436,29 @@ public class DetailActivity extends AppCompatActivity {
         return true;
     }
 
+    public Boolean cekNotif(String id){
+
+        ArrayList<NotifItem> notifItems = db.getAllNotif();
+
+        for (NotifItem n : notifItems){
+
+            if (n.getValue().equals(id)){
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+        notifyAdapter();
+
+    }
 
 
 }

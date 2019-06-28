@@ -70,42 +70,6 @@
 
     </ScrollView>
 
-    <!--<android.support.v4.widget.NestedScrollView-->
-
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="350dp"-->
-        <!--android:id="@+id/bottom_sheet"-->
-        <!--android:background="@color/colorAccent">-->
-
-        <!--&lt;!&ndash;<LinearLayout&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="match_parent"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:orientation="vertical">&ndash;&gt;-->
-
-            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:text="Peserta Baru"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:textSize="25sp"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:textColor="@android:color/white"/>&ndash;&gt;-->
-
-            <!--&lt;!&ndash;&lt;!&ndash;<ListView&ndash;&gt;&ndash;&gt;-->
-
-                <!--&lt;!&ndash;&lt;!&ndash;android:id="@+id/peserta_list"&ndash;&gt;&ndash;&gt;-->
-                <!--&lt;!&ndash;&lt;!&ndash;android:layout_marginTop="10dp"&ndash;&gt;&ndash;&gt;-->
-                <!--&lt;!&ndash;&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;&ndash;&gt;-->
-                <!--&lt;!&ndash;&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;&ndash;&gt;-->
-
-            <!--&lt;!&ndash;&lt;!&ndash;</ListView>&ndash;&gt;&ndash;&gt;-->
-
-        <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
-
-
-
-
-    <!--</android.support.v4.widget.NestedScrollView>-->
 
     <include layout="@layout/bottom_sheet" />
 
