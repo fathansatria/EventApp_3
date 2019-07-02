@@ -1,6 +1,5 @@
 package com.example.eventapp;
 
-import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,25 +7,25 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.eventapp.Adapter.CustomItemClickListener;
+import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.example.eventapp.Adapter.NotificationAdapter;
-import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
-import com.example.eventapp.Adapter.RecyclerViewTouchListener;
 import com.example.eventapp.Database.DatabaseHelper;
-import com.example.eventapp.Model.PesertaModel;
+import com.example.eventapp.Model.NotifItem;
 import java.util.ArrayList;
 
 
 public class NotificationFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private LinearLayout recyclerLayout, emptyLayout;
     private DatabaseHelper db;
     private NotificationAdapter notifAdapter;
     private ArrayList<NotifItem> notifItems;
@@ -38,12 +37,17 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
 
+        db = new DatabaseHelper(getActivity());
         View appName = getActivity().findViewById(R.id.title_event);
         View btnNotif = getActivity().findViewById(R.id.btn_notif);
         View backBtn = getActivity().findViewById(R.id.btn_back_notif);
         View etJumlahNotif = getActivity().findViewById(R.id.cart_badge);
-
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
+
+        emptyLayout = view.findViewById(R.id.empty_notif);
+        recyclerLayout = view.findViewById(R.id.recycler_view_layout);
+        recyclerView =  view.findViewById(R.id.recycler_view_notif);
+        recyclerView.setHasFixedSize(true);
 
 
         if( appName instanceof TextView) {
@@ -75,60 +79,28 @@ public class NotificationFragment extends Fragment {
         }
 
 
-        db = new DatabaseHelper(getActivity());
-        recyclerView =  view.findViewById(R.id.recycler_view_notif);
-        recyclerView.setHasFixedSize(true);
-
         notifItems = db.getAllNotif();
-        final ArrayList<PesertaModel> pesertaModels = new ArrayList<>();
 
-//        for (NotifItem n : notifItems){
-//
-//            PesertaModel pesertaModel = new PesertaModel();
-//            pesertaModel.setNamaPeserta(n.getNotifTitle());
-//            pesertaModel.setPhone(n.getNotifContent());
-//            pesertaModel.setId_event(n.getValue());
-//
-//            pesertaModels.add(pesertaModel);
-//
-//        }
+        if(notifItems.size() == 0 ){
 
+            recyclerLayout.setVisibility(View.GONE);
+
+            emptyLayout.setVisibility(View.VISIBLE);
+            emptyLayout.setGravity(Gravity.CENTER);
+
+        }
+        else {
+
+            recyclerLayout.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+
+        }
+
+        //int recycler view
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         notifAdapter = new NotificationAdapter(notifItems);
         recyclerView.setAdapter(notifAdapter);
-
-
-
-//        recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity(), recyclerView, new CustomItemClickListener() {
-//
-//
-//            @Override
-//            public void onClick(View view, int position) {
-//
-//                String eventID = String.valueOf(pesertaModels.get(position).getId_event());
-//
-//                NotifItem n1 = new NotifItem();
-//                n1.setValue(pesertaModels.get(position).getId_event());
-//                n1.setNotifTitle(pesertaModels.get(position).getNamaPeserta());
-//                n1.setNotifContent(pesertaModels.get(position).getPhone());
-//                n1.setStatus("read");
-//
-//                db.updateNotif(n1);
-//                goToDetail(eventID);
-//
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//
-//                String eventID = String.valueOf(pesertaModels.get(position).getId_event());
-//                goToDetail(eventID);
-//
-//            }
-//
-//        }));
 
         notifAdapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
             @Override
@@ -155,18 +127,19 @@ public class NotificationFragment extends Fragment {
 
                     notifAdapter.notifyDataSetChanged();
                     goToDetail(value);
+
                 }
 
 
 
             }
 
-            @Override
-            public void onDeleteClick(int position) {
-
-                removeItem(position);
-
-            }
+//            @Override
+//            public void onDeleteClick(int position) {
+//
+//                removeItem(position);
+//
+//            }
         });
 
         return view;
@@ -189,15 +162,15 @@ public class NotificationFragment extends Fragment {
 
     }
 
-    public void removeItem(int position) {
-
-        db.deleteNotification(notifItems.get(position));
-
-        notifItems.remove(position);
-        notifAdapter.notifyItemRemoved(position);
-        notifAdapter.notifyDataSetChanged();
-
-    }
+//    public void removeItem(int position) {
+//
+//        db.deleteNotification(notifItems.get(position));
+//
+//        notifItems.remove(position);
+//        notifAdapter.notifyItemRemoved(position);
+//        notifAdapter.notifyDataSetChanged();
+//
+//    }
 
 
 

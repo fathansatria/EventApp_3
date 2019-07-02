@@ -6,11 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.eventapp.Database.DatabaseHelper;
+import com.example.eventapp.Model.NotifItem;
 import com.example.eventapp.Model.apiInterface;
 import com.example.eventapp.Service.apiService;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<NotifItem> notifItems;
     private int jumlahNotif = 0;
     private Fragment notifFragment, mainFragment;
+    //private View fragmentContainer;
 
 
 
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         nNotif = findViewById(R.id.cart_badge);
         db = new DatabaseHelper(this);
         mainFragment = new MainFragment();
+
         cekNotif();
 
         FirebaseMessaging.getInstance().subscribeToTopic("global")
@@ -123,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         cekNotif();
 
         if (notifFragment != null && notifFragment.isVisible()) {
-
 
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     mainFragment, mainFragment.toString()).addToBackStack(mainFragment.

@@ -1,4 +1,4 @@
-package com.example.eventapp;
+package com.example.eventapp.Model;
 
 public class NotifItem {
     

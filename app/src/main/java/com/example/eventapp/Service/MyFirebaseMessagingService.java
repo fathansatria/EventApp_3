@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.DetailActivity;
-import com.example.eventapp.NotifItem;
+import com.example.eventapp.Model.NotifItem;
 import com.example.eventapp.R;
 import com.example.eventapp.WebActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -106,52 +106,61 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
 
+        try {
 
-        if(type.equals("3")){
+            if(type.equals("3")){
 
-            Intent myIntent = new Intent(this, WebActivity.class);
-            myIntent.putExtra("value", value);
+                Intent myIntent = new Intent(this, WebActivity.class);
+                myIntent.putExtra("value", value);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    myIntent,
-                    Intent.FILL_IN_ACTION);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        this,
+                        0,
+                        myIntent,
+                        Intent.FILL_IN_ACTION);
 
-            notificationBuilder.
-                    setAutoCancel(true).
-                    setDefaults(Notification.DEFAULT_ALL).
-                    setWhen(System.currentTimeMillis()).
-                    setSmallIcon(R.drawable.ic_notif).
-                    setContentTitle(title).
-                    setContentIntent(pendingIntent).
-                    setContentText(body).setContentInfo("Info");
+                notificationBuilder.
+                        setAutoCancel(true).
+                        setDefaults(Notification.DEFAULT_ALL).
+                        setWhen(System.currentTimeMillis()).
+                        setSmallIcon(R.drawable.ic_notif).
+                        setContentTitle(title).
+                        setContentIntent(pendingIntent).
+                        setContentText(body).setContentInfo("Info");
 
-            notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+                notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+            }
+            else {
+
+                Intent myIntent = new Intent(this, DetailActivity.class);
+                myIntent.putExtra("value", value);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        this,
+                        0,
+                        myIntent,
+                        Intent.FILL_IN_ACTION);
+
+                notificationBuilder.
+                        setAutoCancel(true).
+                        setDefaults(Notification.DEFAULT_ALL).
+                        setWhen(System.currentTimeMillis()).
+                        setSmallIcon(R.drawable.ic_notif).
+                        setContentTitle(title).
+                        setContentIntent(pendingIntent).
+                        setContentText(body).setContentInfo("Info");
+
+                notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+
+            }
+
         }
-        else {
+        catch (Exception e){
 
-            Intent myIntent = new Intent(this, DetailActivity.class);
-            myIntent.putExtra("value", value);
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    this,
-                    0,
-                    myIntent,
-                    Intent.FILL_IN_ACTION);
-
-            notificationBuilder.
-                    setAutoCancel(true).
-                    setDefaults(Notification.DEFAULT_ALL).
-                    setWhen(System.currentTimeMillis()).
-                    setSmallIcon(R.drawable.ic_notif).
-                    setContentTitle(title).
-                    setContentIntent(pendingIntent).
-                    setContentText(body).setContentInfo("Info");
-
-            notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+            Log.d("Notification", "Notification failed to receive");
 
         }
+
 
 
 

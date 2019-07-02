@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.example.eventapp.Model.PesertaModel;
-import com.example.eventapp.NotifItem;
+import com.example.eventapp.Model.NotifItem;
 import java.util.ArrayList;
 
 
@@ -150,13 +150,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<PesertaModel> getAllPeserta() {
 
         ArrayList<PesertaModel> pesertaModels = new ArrayList<>();
-
-        PesertaModel p1 = new PesertaModel();
-        p1.setNamaPeserta(" Nama ");
-        p1.setEmail(" ");
-        p1.setPhone(" ");
-        p1.setKeterangan(" ");
-        pesertaModels.add(p1);
 
         String selectQuery = "SELECT  * FROM " + TABLE_PESERTA;
 

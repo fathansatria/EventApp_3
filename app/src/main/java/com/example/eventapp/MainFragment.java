@@ -64,7 +64,6 @@ public class MainFragment extends Fragment {
 
                 String eventID = events.get(position).getId();
 
-
                 goToDetail(eventID);
 
             }
@@ -142,7 +141,7 @@ public class MainFragment extends Fragment {
 
     void goToDetail(String eventId) {
 
-        Intent intent = new Intent(getActivity(),DetailActivity.class);
+        Intent intent = new Intent(getActivity(),DetailActivity2.class);
         intent.putExtra("eventId", eventId);
 
         startActivity(intent);

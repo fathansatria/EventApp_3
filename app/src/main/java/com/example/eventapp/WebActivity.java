@@ -3,6 +3,9 @@ package com.example.eventapp;
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -16,6 +19,7 @@ public class WebActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
@@ -29,14 +33,15 @@ public class WebActivity extends AppCompatActivity {
             url = "https://xxxxxxxxxx/xxxxxxx";
         }
 
+        //init dialog
         pDialog = new ProgressDialog(this, R.style.MyAlertDialogStyle);
         pDialog.setCancelable(false);
         pDialog.setMessage(" Wait For Page ");
         pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-
         showDialog();
 
-        webView = (WebView) findViewById(R.id.webview);
+        //init web view
+        webView = findViewById(R.id.webview);
         webViewClient = new WebViewClient();
         webView.setWebViewClient(new WebViewClient() {
 
@@ -49,14 +54,26 @@ public class WebActivity extends AppCompatActivity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
+        //init toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar_web);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
 
+                onBackPressed();
+            }
 
+        });
 
     }
 
     @Override
     public void onBackPressed() {
+
         if (webView.canGoBack()) {
             webView.goBack();
         } else {

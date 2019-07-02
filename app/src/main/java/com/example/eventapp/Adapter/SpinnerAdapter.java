@@ -6,11 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import com.example.eventapp.Model.PesertaModel;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class SpinnerAdapter extends ArrayAdapter<PesertaModel> {
 

@@ -1,7 +1,6 @@
 package com.example.eventapp.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,11 +13,8 @@ import android.widget.TextView;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.DetailActivity;
 import com.example.eventapp.DetailActivity2;
-import com.example.eventapp.MainActivity;
-import com.example.eventapp.MainFragment;
 import com.example.eventapp.Model.PesertaModel;
-import com.example.eventapp.NotifItem;
-import com.example.eventapp.NotificationFragment;
+import com.example.eventapp.Model.NotifItem;
 import com.example.eventapp.R;
 
 import java.util.ArrayList;
