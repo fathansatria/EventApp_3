@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EventApp</string>
+    <string name="nomor_telepon">Nomor telepon</string>
 </resources>

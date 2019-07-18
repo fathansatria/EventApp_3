@@ -31,6 +31,9 @@ public interface apiInterface {
     @GET("product")
     Call<List<Item>> getItem();
 
+    @GET("")
+    Call<ResponseBody> getFile();
+
     @GET("product/epaper/{link}")
     Call<String> getCount(@Path(value = "link") String link);
 
@@ -48,9 +51,13 @@ public interface apiInterface {
     Call<ArrayList<Item>> getSearch (@Field("type") String jenis, @Field("title") String title,@Field("page") int offset);
 
 
+    @Streaming
+    @GET("https://vignette.wikia.nocookie.net/bandori/images/f/f7/01.Neo-Aspect.ogg/revision/latest?cb=20180520101512")
+    Call<ResponseBody> downloadFile();
+
+
 
     class AppSetup{
-
 
 
         @SerializedName(value="status")

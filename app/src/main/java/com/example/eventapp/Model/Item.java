@@ -42,6 +42,7 @@ public class Item implements Parcelable {
 
 
     protected Item(Parcel in) {
+
         id = in.readString();
         kategori = in.readString();
         title = in.readString();
@@ -53,6 +54,7 @@ public class Item implements Parcelable {
         detail = in.createTypedArrayList(LabelItem.CREATOR);
         weight = in.readInt();
         type = in.readString();
+
     }
 
     public static final Creator<Item> CREATOR = new Creator<Item>() {

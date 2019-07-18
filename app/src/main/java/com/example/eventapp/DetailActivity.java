@@ -20,7 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
-import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
+import com.example.eventapp.Adapter.PesertaAdapter;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.Model.Item;
 import com.example.eventapp.Model.PesertaModel;
@@ -49,10 +49,12 @@ public class DetailActivity extends AppCompatActivity {
     apiInterface apiI = apiService.getClient().create(apiInterface.class);
     private ImageView event_image;
     private RecyclerView recyclerView;
-    public static PesertaRecyclerAdapter pesertaRecyclerAdapter;
     private LinearLayout emptyView;
     private Spinner spinner;
     private RelativeLayout formPesertaBaru;
+    private Dialog popUp;
+    private EditText et_nama,et_telp,et_email,et_keterangan;
+    private PesertaAdapter pesertaAdapter;
 
 
 
@@ -76,6 +78,7 @@ public class DetailActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btn_back_detail);
         recyclerView =  findViewById(R.id.peserta_recycler_view);
         recyclerView.setHasFixedSize(true);
+
         db = new DatabaseHelper(this);
 
         //ambil event id dari main activity
@@ -89,8 +92,6 @@ public class DetailActivity extends AppCompatActivity {
         else{
             event_id = "-9999";
         }
-
-
 
         //ambil peserta yang sudah di daftar di event
         try{
@@ -145,11 +146,40 @@ public class DetailActivity extends AppCompatActivity {
         // ambil data detail dari event
         seeDetail(event_id);
 
-
         //init RecylerView
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        pesertaRecyclerAdapter = new PesertaRecyclerAdapter(pesertaModels, this, db);
+        pesertaAdapter = new PesertaAdapter(pesertaModels);
+        recyclerView.setAdapter(pesertaAdapter);
+
+        pesertaAdapter.setOnItemClickListener(new PesertaAdapter.OnItemClickListener() {
+
+
+            @Override
+            public void onItemClick(int position) {
+
+                //can't click
+
+            }
+
+            @Override
+            public void onDeleteClick(int position) {
+
+                db.deletePesertaDaftar(pesertaModels.get(position));
+
+                PesertaModel n = new PesertaModel();
+                n.setNamaPeserta(pesertaModels.get(position).getNamaPeserta());
+                n.setEmail(pesertaModels.get(position).getEmail());
+                n.setPhone(pesertaModels.get(position).getPhone());
+                n.setKeterangan(pesertaModels.get(position).getKeterangan());
+                n.setId_event(pesertaModels.get(position).getId_event());
+                pesertaModels.remove(position);
+
+                pesertaAdapter.notifyDataSetChanged();
+            }
+
+        });
+
 
         if (pesertaModels.size() == 0){
             emptyView.setVisibility(View.VISIBLE);
@@ -160,21 +190,21 @@ public class DetailActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.VISIBLE);
         }
 
-        pesertaRecyclerAdapter.notifyDataSetChanged();
-        recyclerView.setAdapter(pesertaRecyclerAdapter);
 
         db.closeDB();
-
 
     }
 
     public void showPopUp(){
 
-
-        final Dialog popUp = new Dialog(DetailActivity.this);
+        popUp = new Dialog(DetailActivity.this);
 
         try
         {
+            int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+            int height = (int)(getResources().getDisplayMetrics().heightPixels*0.90);
+
+            popUp.getWindow().setLayout(width, height);
             popUp.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         }
@@ -187,91 +217,10 @@ public class DetailActivity extends AppCompatActivity {
 
         final Button btnCancel = popUp.findViewById(R.id.btn_cancel);
         final Button btnDaftar = popUp.findViewById(R.id.btn_daftar);
-        final EditText et_nama = popUp.findViewById(R.id.et_nama);
-        final EditText et_telp = popUp.findViewById(R.id.et_telepon);
-        final EditText et_email = popUp.findViewById(R.id.et_email);
-        final EditText et_keterangan = popUp.findViewById(R.id.et_keterangan);
 
 
-
-
-        et_nama.setFocusable(true);
-        et_nama.setFocusableInTouchMode(true);
-        et_nama.setCursorVisible(true);
-
-        et_email.setFocusable(true);
-        et_email.setFocusableInTouchMode(true);
-        et_email.setCursorVisible(true);
-
-        et_keterangan.setFocusable(true);
-        et_keterangan.setFocusableInTouchMode(true);
-        et_keterangan.setCursorVisible(true);
-
-
-
-        final ArrayList<PesertaModel> namaPeserta = db.getAllPeserta();
-        final ArrayList<String> nama = new ArrayList<>();
-        nama.add(" Nama ");
-        nama.add(" Daftar Peserta Baru ");
-
-        for (PesertaModel pesertaModel : namaPeserta) {
-
-            nama.add(pesertaModel.getNamaPeserta());
-
-        }
-
-
-//        final SpinnerAdapter spinnerAdapter = new SpinnerAdapter(DetailActivity.this,android.R.layout.simple_spinner_item, namaPeserta);
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        //init Spinner
-        spinner = popUp.findViewById(R.id.spin_nama);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, nama);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(arrayAdapter);
-
-        formPesertaBaru = popUp.findViewById(R.id.et_form);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-                String selectedItem =  nama.get(position);
-
-                if(selectedItem.equals(" Nama "))
-                {
-                    formPesertaBaru.setVisibility(View.GONE);
-
-                }
-                else if(selectedItem.equals(" Daftar Peserta Baru ")){
-
-                    formPesertaBaru.setVisibility(View.VISIBLE);
-
-                }
-                else {
-
-//                    et_nama.setText(selectedItem.getNamaPeserta());
-//                    et_email.setText(selectedItem.getEmail());
-//                    et_telp.setText(selectedItem.getPhone());
-//                    et_keterangan.setText(selectedItem.getKeterangan());
-
-                    PesertaModel p = namaPeserta.get(position);
-
-                    formPesertaBaru.setVisibility(View.VISIBLE);
-                    spinner.setVisibility(View.GONE);
-                    et_nama.setText(p.getNamaPeserta());
-                    et_email.setText(p.getEmail());
-                    et_telp.setText(p.getPhone());
-                    et_keterangan.setText(p.getKeterangan());
-                }
-
-            } // to close the onItemSelected
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-
-            }
-        });
-
+        initForm();
+        setupSpinner();
 
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -330,7 +279,9 @@ public class DetailActivity extends AppCompatActivity {
 
                         pesertaModels.add(c1);
                         popUp.dismiss();
-                        pesertaRecyclerAdapter.notifyDataSetChanged();
+                        pesertaAdapter.notifyDataSetChanged();
+
+                        //pesertaRecyclerAdapter.notifyDataSetChanged();
 
                         if (pesertaModels.size() == 0){
 
@@ -416,11 +367,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     //refresh data
-    public static void notifyAdapter(){
-
-        pesertaRecyclerAdapter.notifyDataSetChanged();
-
-    }
 
     public Boolean FilterPesertaDaftar(PesertaModel peserta){
 
@@ -463,9 +409,85 @@ public class DetailActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         super.onBackPressed();
-        notifyAdapter();
+        pesertaAdapter.notifyDataSetChanged();
 
     }
 
+    public void setupSpinner () {
 
+        final ArrayList<PesertaModel> namaPeserta = db.getAllPeserta();
+        final ArrayList<String> nama = new ArrayList<>();
+        nama.add(" Nama ");
+        nama.add(" Daftar Peserta Baru ");
+
+        for (PesertaModel pesertaModel : namaPeserta) {
+
+            nama.add(pesertaModel.getNamaPeserta());
+
+        }
+
+        spinner = popUp.findViewById(R.id.spin_nama);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, nama);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
+
+        formPesertaBaru = popUp.findViewById(R.id.et_form);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String selectedItem =  nama.get(position);
+
+                if(selectedItem.equals(" Nama "))
+                {
+                    formPesertaBaru.setVisibility(View.GONE);
+
+                }
+                else if(selectedItem.equals(" Daftar Peserta Baru ")){
+
+                    formPesertaBaru.setVisibility(View.VISIBLE);
+
+                }
+                else {
+
+                    PesertaModel p = namaPeserta.get(position - 2 );
+
+                    formPesertaBaru.setVisibility(View.VISIBLE);
+                    spinner.setVisibility(View.GONE);
+                    et_nama.setText(p.getNamaPeserta());
+                    et_email.setText(p.getEmail());
+                    et_telp.setText(p.getPhone());
+                    et_keterangan.setText(p.getKeterangan());
+                }
+
+            } // to close the onItemSelected
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+
+        });
+    }
+
+    public void initForm() {
+
+        et_nama = popUp.findViewById(R.id.et_nama);
+        et_telp = popUp.findViewById(R.id.et_telepon);
+        et_email = popUp.findViewById(R.id.et_email);
+        et_keterangan = popUp.findViewById(R.id.et_keterangan);
+
+        et_nama.setFocusable(true);
+        et_nama.setFocusableInTouchMode(true);
+        et_nama.setCursorVisible(true);
+
+        et_email.setFocusable(true);
+        et_email.setFocusableInTouchMode(true);
+        et_email.setCursorVisible(true);
+
+        et_keterangan.setFocusable(true);
+        et_keterangan.setFocusableInTouchMode(true);
+        et_keterangan.setCursorVisible(true);
+
+    }
 }

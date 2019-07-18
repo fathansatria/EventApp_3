@@ -6,9 +6,10 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -33,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<NotifItem> notifItems;
     private int jumlahNotif = 0;
     private Fragment notifFragment, mainFragment;
-    //private View fragmentContainer;
-
-
 
 
     @Override
@@ -48,24 +46,13 @@ public class MainActivity extends AppCompatActivity {
         appName = findViewById(R.id.title_event);
         backButton = findViewById(R.id.btn_back_notif);
         nNotif = findViewById(R.id.cart_badge);
-        db = new DatabaseHelper(this);
         mainFragment = new MainFragment();
+        db = new DatabaseHelper(this);
+
 
         cekNotif();
 
-        FirebaseMessaging.getInstance().subscribeToTopic("global")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                        if (!task.isSuccessful()) {
-
-                            Log.d("notif", "Notification Received");
-
-                        }
-
-                    }
-                });
+        firebaseNotificationService();
 
 
         if(savedInstanceState == null){
@@ -97,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     @Override
@@ -160,6 +146,24 @@ public class MainActivity extends AppCompatActivity {
             nNotif.setText(String.valueOf(jumlahNotif));
         }
 
+
+    }
+
+    public void firebaseNotificationService(){
+
+        FirebaseMessaging.getInstance().subscribeToTopic("global")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (!task.isSuccessful()) {
+
+                            Log.d("notif", "Notification Received");
+
+                        }
+
+                    }
+                });
 
     }
 }

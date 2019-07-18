@@ -23,8 +23,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TELEPON = "telepon";
 
 
-
-
     private String TBL_CREATE_MHS = "create table " + TABLE_PESERTA + " (" +
             ID + " int primary key," +
             NAMA + " text," +
@@ -124,6 +122,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public long daftarPesertaEvent (PesertaModel peserta){
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -141,10 +140,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return id ;
     }
-
-    /*
-     * Creating tag
-     */
 
 
     public ArrayList<PesertaModel> getAllPeserta() {
@@ -171,6 +166,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 pesertaModels.add(std);
             } while (c.moveToNext());
         }
+
+        db.close();
 
         return pesertaModels;
     }
@@ -202,29 +199,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return notifItems;
     }
-
-    public ArrayList<String> getAllPesertaName() {
-
-        ArrayList<String> pesertaNames = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_PESERTA;
-        pesertaNames.add("Nama");
-        Log.e(DATABASENAME, selectQuery);
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (c.moveToFirst()) {
-            do {
-                // adding to todo list
-                pesertaNames.add(c.getString(c.getColumnIndex(NAMA)));
-
-            } while (c.moveToNext());
-        }
-
-        return pesertaNames;
-    }
-
 
 
 
@@ -268,14 +242,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void deletePeserta( PesertaModel peserta) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // delete row
-        db.delete(TABLE_PESERTA, NAMA + " = ? AND " + EMAIL + " = ? ",
-                new String[] { peserta.getNamaPeserta(), peserta.getPhone() });
-    }
 
     public void deletePesertaDaftar( PesertaModel peserta) {
 
@@ -299,38 +265,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 
-    public ArrayList<PesertaModel> getAllPesertaByName(String nama) {
-
-        ArrayList<PesertaModel> pesertas = new ArrayList<PesertaModel>();
-
-        String selectQuery = "SELECT  * FROM " + TABLE_PESERTA + " tm WHERE tm."
-                + NAMA + " = '" + nama + "'";
-
-        Log.e(DATABASENAME, selectQuery);
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (c.moveToFirst()) {
-            do {
-
-                PesertaModel c1 = new PesertaModel();
-                c1.setNamaPeserta(c.getString((c.getColumnIndex(NAMA))));
-                c1.setPhone(c.getString((c.getColumnIndex(TELEPON))));
-                c1.setEmail(c.getString((c.getColumnIndex(EMAIL))));
-                c1.setKeterangan(c.getString((c.getColumnIndex(KETERANGAN))));
-
-                // adding to courses
-                pesertas.add(c1);
-
-            } while (c.moveToNext());
-        }
-
-        return pesertas;
-
-    }
-
     public int updateNotif(NotifItem notifItem) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -345,6 +279,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // updating row
         return db.update(TABLE_NOTIF, values, VALUE_NOTIF + " = ? AND " + NOTIF_TITLE + " = ? ",
                 new String[] { notifItem.getValue(), notifItem.getNotifTitle() });
+
     }
 
 

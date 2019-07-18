@@ -16,6 +16,8 @@ public class apiService {
     private static final String BASE_URL = "https://p.republika.co.id/";
 
 
+
+
     public static class AddHeaderInterceptor implements Interceptor {
         @Override
         public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -36,6 +38,21 @@ public class apiService {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
             retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(client).build();
+
+        } else {
+            Log.i("q","errorr");
+        }
+        return retrofit;
+    }
+
+    public static Retrofit getClient1(String url) {
+
+        if (retrofit == null) {
+
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+            retrofit = new Retrofit.Builder().baseUrl(url).addConverterFactory(GsonConverterFactory.create()).client(client).build();
 
         } else {
             Log.i("q","errorr");

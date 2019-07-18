@@ -1,7 +1,5 @@
 package com.example.eventapp.Model;
 
-import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
-
 public class PesertaModel {
 
     private String namaPeserta;

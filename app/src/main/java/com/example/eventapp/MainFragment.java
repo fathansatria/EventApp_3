@@ -8,15 +8,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.eventapp.Adapter.CustomItemClickListener;
-import com.example.eventapp.Adapter.EventRecyclerAdapter;
-import com.example.eventapp.Adapter.RecyclerViewTouchListener;
-import com.example.eventapp.Database.DatabaseHelper;
+import com.example.eventapp.Adapter.EndlessRecyclerViewOnScrollListener;
+import com.example.eventapp.Adapter.EventAdapter;
 import com.example.eventapp.Model.Item;
 import com.example.eventapp.Model.apiInterface;
 import com.example.eventapp.Service.apiService;
@@ -31,10 +30,9 @@ import retrofit2.Response;
 public class MainFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private DatabaseHelper db;
     private ProgressDialog pDialog;
     private ArrayList<Item> events;
-    private EventRecyclerAdapter eventAdapter;
+    private EventAdapter eventAdapter;
     private apiService apiInit = new apiService();
     apiInterface apiI = apiService.getClient().create(apiInterface.class);
 
@@ -46,37 +44,15 @@ public class MainFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        db = new DatabaseHelper(getActivity());
         recyclerView =  view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-
         pDialog = new ProgressDialog(getActivity(), R.style.MyAlertDialogStyle);
         pDialog.setCancelable(false);
 
         //melakukan pencarian data
-        doSearch("","quran");
-
-        //listener buat item click dari recycler
-        recyclerView.addOnItemTouchListener(new RecyclerViewTouchListener(getActivity(), recyclerView, new CustomItemClickListener() {
-
-            @Override
-            public void onClick(View view, int position) {
-
-                String eventID = events.get(position).getId();
-
-                goToDetail(eventID);
-
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
+        doSearch("","foto");
 
 
-                String eventID = events.get(position).getId();
-
-                goToDetail(eventID);
-            }
-        }));
 
         return view;
 
@@ -98,7 +74,6 @@ public class MainFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
         //Input data to recycler view
         Itemmm.enqueue(new Callback<ArrayList<Item>>() {
             @Override
@@ -113,10 +88,8 @@ public class MainFragment extends Fragment {
 
                     hideDialog();
                     events = new ArrayList<>(response.body());
-                    eventAdapter = new EventRecyclerAdapter(new ArrayList<>(response.body()),getActivity());
-                    eventAdapter.notifyDataSetChanged();
-                    recyclerView.setAdapter(eventAdapter);
-                    recyclerView.setVisibility(View.VISIBLE);
+                    initAdapter();
+
 
                 }
             }
@@ -127,9 +100,56 @@ public class MainFragment extends Fragment {
                 recyclerView.setVisibility(View.GONE);
             }
         });
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewOnScrollListener(linearLayoutManager) {
+
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                Log.i("testScroll", String.valueOf(dy));
+//
+//                if(dy > 0){ // only when scrolling up
+//
+//                    final int visibleThreshold = 2;
+//
+//                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//
+//                    int lastItem  = 0;
+//
+//                    if (layoutManager != null) {
+//                        lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
+//
+//                        int currentTotalCount = layoutManager.getItemCount();
+//
+//                        if(currentTotalCount <= lastItem + visibleThreshold){
+//
+//                            loadNextPage(currentTotalCount);
+//
+//                        }
+//                    }
+//
+//
+//                }
+//            }
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                //Log.i("ereasrs", String.valueOf(totalItemsCount));
+                //if (totalItemsCount > 4) {
+                //progressBar.setVisibility(view.VISIBLE);
+                loadNextPage(totalItemsCount);
+                //Log.i("pagex", String.valueOf(totalItemsCount));
+                //}
+
+            }
+        });
     }
 
     private void showDialog() {
+
         if (!pDialog.isShowing())
             pDialog.show();
     }
@@ -141,10 +161,63 @@ public class MainFragment extends Fragment {
 
     void goToDetail(String eventId) {
 
-        Intent intent = new Intent(getActivity(),DetailActivity2.class);
+        Intent intent = new Intent(getActivity(),DetailActivity.class);
         intent.putExtra("eventId", eventId);
 
         startActivity(intent);
+    }
+
+    public void loadNextPage(final int page) {
+        if (page < 5)
+            return;
+        Call<ArrayList<Item>> Itemmm;
+
+        if ("".equals("")) {
+            Itemmm = apiI.getJenis("foto", page);
+        } else {
+            Itemmm = apiI.getSearch("foto", "", page);
+        }
+        Itemmm.enqueue(new Callback<ArrayList<Item>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
+
+                if (response.body() == null) {
+                    //Log.i("re","empty");
+                } else {
+                    eventAdapter.addData(new ArrayList<>(response.body()));
+                    //afoto.notifyItemRangeChanged(0, afoto.getItemCount());
+                    //progressBar.setVisibility(View.GONE);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
+                // progressBar.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
+
+    void initAdapter () {
+
+        eventAdapter = new EventAdapter(events,getActivity());
+        eventAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(eventAdapter);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        eventAdapter.setOnItemClickListener( new EventAdapter.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(int position) {
+
+                String eventID = events.get(position).getId();
+                goToDetail(eventID);
+
+            }
+
+        });
     }
 
 

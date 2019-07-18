@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.example.eventapp.Adapter.NotificationAdapter;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.Model.NotifItem;
@@ -38,6 +36,7 @@ public class NotificationFragment extends Fragment {
 
 
         db = new DatabaseHelper(getActivity());
+
         View appName = getActivity().findViewById(R.id.title_event);
         View btnNotif = getActivity().findViewById(R.id.btn_notif);
         View backBtn = getActivity().findViewById(R.id.btn_back_notif);
@@ -79,6 +78,7 @@ public class NotificationFragment extends Fragment {
         }
 
 
+        //cek ada notif
         notifItems = db.getAllNotif();
 
         if(notifItems.size() == 0 ){
@@ -97,12 +97,39 @@ public class NotificationFragment extends Fragment {
         }
 
         //int recycler view
+        setUpRecycler();
+
+
+        return view;
+    }
+
+
+    public void goToDetail(String eventId){
+
+        Intent intent = new Intent(getActivity(),DetailActivity.class);
+        intent.putExtra("eventId", eventId);
+        startActivity(intent);
+
+    }
+
+    public void goToWeb(String value){
+
+        Intent intent = new Intent(getActivity(),WebActivity.class);
+        intent.putExtra("value", value);
+        startActivity(intent);
+
+    }
+
+    public void setUpRecycler(){
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         notifAdapter = new NotificationAdapter(notifItems);
         recyclerView.setAdapter(notifAdapter);
 
         notifAdapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
+
+
             @Override
             public void onItemClick(int position) {
 
@@ -115,7 +142,6 @@ public class NotificationFragment extends Fragment {
                 n1.setStatus("read");
                 db.updateNotif(n1);
 
-                //Toast.makeText(getActivity(), notifItems.get(position).getType(), Toast.LENGTH_LONG).show();
 
                 if(notifItems.get(position).getType().equals("3")){
 
@@ -130,47 +156,11 @@ public class NotificationFragment extends Fragment {
 
                 }
 
-
-
             }
 
-//            @Override
-//            public void onDeleteClick(int position) {
-//
-//                removeItem(position);
-//
-//            }
         });
-
-        return view;
     }
 
-
-    void goToDetail(String eventId){
-
-        Intent intent = new Intent(getActivity(),DetailActivity.class);
-        intent.putExtra("eventId", eventId);
-        startActivity(intent);
-
-    }
-
-    void goToWeb(String value){
-
-        Intent intent = new Intent(getActivity(),WebActivity.class);
-        intent.putExtra("value", value);
-        startActivity(intent);
-
-    }
-
-//    public void removeItem(int position) {
-//
-//        db.deleteNotification(notifItems.get(position));
-//
-//        notifItems.remove(position);
-//        notifAdapter.notifyItemRemoved(position);
-//        notifAdapter.notifyDataSetChanged();
-//
-//    }
 
 
 

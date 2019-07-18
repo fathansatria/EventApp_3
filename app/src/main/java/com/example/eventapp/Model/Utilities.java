@@ -53,7 +53,6 @@ public class Utilities {
     }
 
 
-
     /**
      * Screen Size Utility goes here
      */

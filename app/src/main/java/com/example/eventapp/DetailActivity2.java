@@ -2,12 +2,12 @@ package com.example.eventapp;
 
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,8 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.eventapp.Adapter.PesertaRecyclerAdapter;
-//import com.example.eventapp.Adapter.SpinnerAdapter;
+import com.example.eventapp.Adapter.PesertaAdapter;
 import com.example.eventapp.Database.DatabaseHelper;
 import com.example.eventapp.Model.Item;
 import com.example.eventapp.Model.PesertaModel;
@@ -40,12 +39,11 @@ import static com.example.eventapp.Model.Utilities.isEmailValid;
 
 public class DetailActivity2 extends AppCompatActivity {
 
-    private TextView tv_eventTitle,tv_content,tv_author;
+    private TextView tv_content,tv_author;
     private ImageView iv_eventImage;
     private RecyclerView recyclerView;
     private Button btn_harga;
     private DatabaseHelper db;
-    private static PesertaRecyclerAdapter pesertaRecyclerAdapter;
     apiInterface apiI;
     apiService apiInit;
     private String event_id;
@@ -55,6 +53,8 @@ public class DetailActivity2 extends AppCompatActivity {
     private RelativeLayout formPesertaBaru;
     private String newName, newTelp, newEmail, newKeterangan;
     private LinearLayout emptyView;
+    private PesertaAdapter pesertaAdapter;
+    private Dialog popUp;
 
 
     @Override
@@ -62,7 +62,6 @@ public class DetailActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail2);
 
-        //tv_eventTitle = findViewById(R.id.tv_eventTitle);
         tv_content = findViewById(R.id.tv_content2);
         tv_author = findViewById(R.id.author2);
         iv_eventImage = findViewById(R.id.iv_event_image);
@@ -74,6 +73,7 @@ public class DetailActivity2 extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -117,8 +117,37 @@ public class DetailActivity2 extends AppCompatActivity {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        pesertaRecyclerAdapter = new PesertaRecyclerAdapter(eventPesertaModels, this, db);
-        recyclerView.setAdapter(pesertaRecyclerAdapter);
+        pesertaAdapter = new PesertaAdapter(eventPesertaModels);
+        recyclerView.setAdapter(pesertaAdapter);
+
+        pesertaAdapter.setOnItemClickListener(new PesertaAdapter.OnItemClickListener() {
+
+
+            @Override
+            public void onItemClick(int position) {
+
+                //can't click
+
+            }
+
+            @Override
+            public void onDeleteClick(int position) {
+
+                db.deletePesertaDaftar(eventPesertaModels.get(position));
+
+                PesertaModel n = new PesertaModel();
+                n.setNamaPeserta(eventPesertaModels.get(position).getNamaPeserta());
+                n.setEmail(eventPesertaModels.get(position).getEmail());
+                n.setPhone(eventPesertaModels.get(position).getPhone());
+                n.setKeterangan(eventPesertaModels.get(position).getKeterangan());
+                n.setId_event(eventPesertaModels.get(position).getId_event());
+                eventPesertaModels.remove(position);
+
+                pesertaAdapter.notifyDataSetChanged();
+
+            }
+
+        });
         recyclerView.setHasFixedSize(true);
 
 
@@ -139,9 +168,10 @@ public class DetailActivity2 extends AppCompatActivity {
 
     public void showPopUp(){
 
-        final Dialog popUp = new Dialog(DetailActivity2.this);
+        popUp = new Dialog(DetailActivity2.this);
 
         try{
+
             popUp.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         }
@@ -154,29 +184,32 @@ public class DetailActivity2 extends AppCompatActivity {
 
         Button btnCancel = popUp.findViewById(R.id.btn_cancel);
         Button btnDaftar = popUp.findViewById(R.id.btn_daftar);
-        et_nama = popUp.findViewById(R.id.et_nama);
-        et_telp = popUp.findViewById(R.id.et_telepon);
-        et_email = popUp.findViewById(R.id.et_email);
-        et_keterangan = popUp.findViewById(R.id.et_keterangan);
-        //spinner = popUp.findViewById(R.id.spin_nama);
-        formPesertaBaru = popUp.findViewById(R.id.et_form);
 
-        et_nama.setFocusable(true);
-        et_nama.setFocusableInTouchMode(true);
-        et_nama.setCursorVisible(true);
+        //initForm
+        initForm();
+        //settings spinner
+        setupSpinner();
 
-        et_email.setFocusable(true);
-        et_email.setFocusableInTouchMode(true);
-        et_email.setCursorVisible(true);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popUp.dismiss();
+            }
+        });
 
-        et_telp.setFocusable(true);
-        et_telp.setFocusableInTouchMode(true);
-        et_telp.setCursorVisible(true);
+        btnDaftar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fillData();
+            }
+        });
 
-        et_keterangan.setFocusable(true);
-        et_keterangan.setFocusableInTouchMode(true);
-        et_keterangan.setCursorVisible(true);
+        popUp.show();
 
+
+    }
+
+    private void setupSpinner() {
 
         final ArrayList<PesertaModel> pesertaModels = db.getAllPeserta();
         final ArrayList<String> nama = new ArrayList<>();
@@ -196,9 +229,6 @@ public class DetailActivity2 extends AppCompatActivity {
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
 
-//        final SpinnerAdapter spinnerAdapter = new SpinnerAdapter(DetailActivity2.this,android.R.layout.simple_spinner_item, pesertaModels);
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(spinnerAdapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
@@ -224,7 +254,7 @@ public class DetailActivity2 extends AppCompatActivity {
 
                     try{
 
-                        PesertaModel p = pesertaModels.get(position);
+                        PesertaModel p = pesertaModels.get(position - 2);
 
                         et_nama.setText(p.getNamaPeserta());
                         et_email.setText(p.getEmail());
@@ -251,96 +281,6 @@ public class DetailActivity2 extends AppCompatActivity {
             }
         });
 
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popUp.dismiss();
-            }
-        });
-
-        btnDaftar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                newName = et_nama.getText().toString();
-                newTelp = et_telp.getText().toString();
-                newEmail = et_email.getText().toString();
-                newKeterangan = et_keterangan.getText().toString();
-
-
-                if(newName.equals("")){
-
-                    Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
-                }
-                else if (newTelp.equals("")){
-
-                    Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
-                }
-                else if (newEmail.equals("")){
-
-                    Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
-                }
-                else if (!(isEmailValid(newEmail))){
-
-                    Toast.makeText(getApplicationContext(), " Please input valid email ",Toast.LENGTH_LONG).show();
-
-                }
-                else
-                {
-                    PesertaModel c1 = new PesertaModel();
-                    c1.setNamaPeserta(newName);
-                    c1.setEmail(newEmail);
-                    c1.setPhone(newTelp);
-                    c1.setId_event(event_id);
-                    c1.setKeterangan(newKeterangan);
-
-
-                    if (FilterPesertaDaftar(c1)){
-
-                        db.daftarPesertaEvent(c1);
-
-                        if (FilterPeserta(c1)){
-
-                            db.daftarPeserta(c1);
-
-                        }
-
-                        eventPesertaModels.add(c1);
-                        popUp.dismiss();
-                        pesertaRecyclerAdapter.notifyDataSetChanged();
-
-                        if (eventPesertaModels.size() == 0){
-
-                            emptyView.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                        }
-                        else{
-
-                            emptyView.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-
-                        }
-
-                        Toast.makeText(getApplicationContext(), "Registrasi Berhasil", Toast.LENGTH_LONG).show();
-                    }
-                    else {
-
-                        Toast.makeText(getApplicationContext(), " Anda Sudah Terdaftar di Event Ini ", Toast.LENGTH_LONG).show();
-
-                    }
-
-                    db.closeDB();
-
-                }
-
-            }
-        });
-
-        popUp.show();
-
-
     }
 
     public Boolean FilterPesertaDaftar(PesertaModel peserta){
@@ -356,12 +296,10 @@ public class DetailActivity2 extends AppCompatActivity {
                 return false;
             }
 
-
         }
 
-
-
         return true;
+
     }
 
     public Boolean FilterPeserta(PesertaModel peserta){
@@ -436,10 +374,104 @@ public class DetailActivity2 extends AppCompatActivity {
 
     }
 
-    //refresh data
-    public static void notifyAdapter(){
+    public void initForm() {
 
-        pesertaRecyclerAdapter.notifyDataSetChanged();
+        et_nama = popUp.findViewById(R.id.et_nama);
+        et_telp = popUp.findViewById(R.id.et_telepon);
+        et_email = popUp.findViewById(R.id.et_email);
+        et_keterangan = popUp.findViewById(R.id.et_keterangan);
+        //spinner = popUp.findViewById(R.id.spin_nama);
+        formPesertaBaru = popUp.findViewById(R.id.et_form);
+
+        et_nama.setFocusable(true);
+        et_nama.setFocusableInTouchMode(true);
+        et_nama.setCursorVisible(true);
+
+        et_email.setFocusable(true);
+        et_email.setFocusableInTouchMode(true);
+        et_email.setCursorVisible(true);
+
+        et_telp.setFocusable(true);
+        et_telp.setFocusableInTouchMode(true);
+        et_telp.setCursorVisible(true);
+
+        et_keterangan.setFocusable(true);
+        et_keterangan.setFocusableInTouchMode(true);
+        et_keterangan.setCursorVisible(true);
+    }
+
+    public void fillData() {
+
+        newName = et_nama.getText().toString();
+        newTelp = et_telp.getText().toString();
+        newEmail = et_email.getText().toString();
+        newKeterangan = et_keterangan.getText().toString();
+
+
+        if(newName.equals("")){
+
+            Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
+        }
+        else if (newTelp.equals("")){
+
+            Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
+        }
+        else if (newEmail.equals("")){
+
+            Toast.makeText(getApplicationContext(), " Please fill all requirements ",Toast.LENGTH_LONG).show();
+        }
+        else if (!(isEmailValid(newEmail))){
+
+            Toast.makeText(getApplicationContext(), " Please input valid email ",Toast.LENGTH_LONG).show();
+
+        }
+        else
+        {
+            PesertaModel c1 = new PesertaModel();
+            c1.setNamaPeserta(newName);
+            c1.setEmail(newEmail);
+            c1.setPhone(newTelp);
+            c1.setId_event(event_id);
+            c1.setKeterangan(newKeterangan);
+
+
+            if (FilterPesertaDaftar(c1)){
+
+                db.daftarPesertaEvent(c1);
+
+                if (FilterPeserta(c1)){
+
+                    db.daftarPeserta(c1);
+
+                }
+
+                eventPesertaModels.add(c1);
+                popUp.dismiss();
+                pesertaAdapter.notifyDataSetChanged();
+
+                if (eventPesertaModels.size() == 0){
+
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                }
+                else{
+
+                    emptyView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+
+                }
+
+                Toast.makeText(getApplicationContext(), "Registrasi Berhasil", Toast.LENGTH_LONG).show();
+            }
+            else {
+
+                Toast.makeText(getApplicationContext(), " Anda Sudah Terdaftar di Event Ini ", Toast.LENGTH_LONG).show();
+
+            }
+
+            db.closeDB();
+
+        }
 
     }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="body_text_size">14sp</dimen>
+    <dimen name="h1">18sp</dimen>
+    <dimen name="h2">14sp</dimen>
+    <dimen name="spinner_size">200dp</dimen>
+    <dimen name="normal_text">10sp</dimen>
+    <dimen name="small_title">12sp</dimen>
+
+
+</resources>
